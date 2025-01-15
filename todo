@@ -1,0 +1,18 @@
+# Tasks for BKND integration
+
+### Primary
+
+- [ ] Remove the Dashboard
+- [ ] Make sure auth is guarded after initial start
+- [ ] Add ability to target Turso db URL for PROD
+- [ ] Figure out how to remove the anchor underlines in the admin
+- [x] After I sign in, redirect to the /admin page.
+- [ ] Get Types working for BKND entities
+- [ ] Update README.md about the switch to BKND from Better Auth and Astro DB
+- [ ] Bump a major version
+- [ ] Update the home page about the switch to BKND
+
+### Secondary
+
+- [ ] (optional) is there an Astro adapter for BKND?
+- [ ] (nitpick) Given I tab when signing in from email to password, make it go to password and not forgot password

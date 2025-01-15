@@ -1,31 +1,33 @@
 ---
+import { getApi } from "bknd/adapter/astro";
 import { actions } from "astro:actions";
-import { setAuthCookiesFromResponse } from "@/actions/auth";
 import Layout from "@/layouts/Layout.astro";
 import Container from "@sections/Container.astro";
 import Navbar from "@sections/Navbar.astro";
 import Footer from "@sections/Footer.astro";
 
-if (Astro.locals.session) {
-  return Astro.redirect("/dashboard");
+const api = getApi(Astro, { mode: "dynamic" });
+const user = api.getUser();
+
+if (user) {
+  return Astro.redirect("/sign-in");
 }
 
-const result = Astro.getActionResult(actions.auth.signUp);
+const result = Astro.getActionResult(actions.bknd.signUp);
 
 if (result?.data?.success) {
-  setAuthCookiesFromResponse(result.data.cookiesToSet, Astro.cookies);
-  return Astro.redirect("/dashboard");
+  return Astro.redirect("/sign-in");
 }
 ---
 
 <Layout title="Sign In">
   <Navbar title="Freedom Stack" sticky links={[{ text: "Home", href: "/" }]} />
-  {result?.error && <div x-init={`toastErrorMessage = '${result.error.message.toString()}'`} class="sr-only" />}
+  {result?.data?.error && <div x-init={`toastErrorMessage = '${result.data.error.toString()}'`} class="sr-only" />}
   <Container align="center">
     <div class="bg-white p-6 rounded-xl border-2 border-slate-200 flex flex-col gap-4 max-w-sm w-full">
       <h1>Create an account</h1>
       <form
-        x-data="{
+        x-data={`{
           name: '',
           email: '',
           password: '',
@@ -36,11 +38,24 @@ if (result?.data?.success) {
               this.email.length > 0 &&
               this.password.length > 0 &&
               this.password === this.confirmPassword;
+          },
+          async post() {
+            const formData = new FormData($refs.form);
+            const response = await fetch(window.location.origin + "/api/auth/password/register", {
+              method: "POST",
+              body: formData
+            });
+
+            // if 302, redirect to the url
+            if (response.redirected) {
+              window.location.href = '/admin';
+            }
           }
-        }"
+        }`}
+        x-ref="form"
         class="flex flex-col gap-4 max-w-sm w-full"
         method="POST"
-        action={actions.auth.signUp}
+        x-on:submit.prevent="post"
       >
         <label class="form-control w-full">
           <div class="label">

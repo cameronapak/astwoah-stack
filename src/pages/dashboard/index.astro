@@ -1,26 +1,26 @@
 ---
-import { Posts, db, desc, eq } from "astro:db";
+import { getApi } from "bknd/adapter/astro";
 import Icon from "astro-iconify";
 import Layout from "@/layouts/Layout.astro";
 import Navbar from "@sections/Navbar.astro";
 import Container from "@sections/Container.astro";
 import Footer from "@sections/Footer.astro";
 
-if (!Astro.locals.session) {
-  return Astro.redirect("/sign-in");
-}
-
-const user = Astro.locals.user as { email: string };
+const api = getApi(Astro, { mode: "dynamic" });
+const user = api.getUser();
 
 if (!user) {
   return Astro.redirect("/sign-in");
 }
 
-const allPosts = await db.select().from(Posts).where(eq(Posts.author, user.email)).orderBy(desc(Posts.pubDate));
+const links = [
+  { text: "Admin", href: "/admin" },
+  { text: "Sign Out", href: "/sign-out" }
+];
 ---
 
 <Layout title="Dashboard">
-  <Navbar title="Freedom Stack" links={[{ text: "Sign Out", href: "/sign-out" }]} />
+  <Navbar title="Freedom Stack" links={links} />
 
   <Container align="center" className="min-h-[60vh]">
     <div class="flex justify-between items-end w-full">
@@ -31,7 +31,7 @@ const allPosts = await db.select().from(Posts).where(eq(Posts.author, user.email
       </a>
     </div>
     <ul class="w-full list-none p-0 m-0 mt-6 flex flex-col gap-6">
-      {
+      <!-- {
         allPosts.map((post) => (
           <li class="w-full m-0">
             <a
@@ -46,7 +46,7 @@ const allPosts = await db.select().from(Posts).where(eq(Posts.author, user.email
             </a>
           </li>
         ))
-      }
+      } -->
     </ul>
   </Container>
   <Footer
